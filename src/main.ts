@@ -93,15 +93,29 @@ export async function createApp() {
   return app;
 }
 
-async function bootstrap() {
-  const app = await createApp();
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
-  console.log(`\uD83D\uDE80 Mosanada SaaS is running on: http://localhost:${port}`);
-  console.log(`\uD83D\uDCDA Swagger UI: http://localhost:${port}/api/docs`);
+// ─── Vercel Serverless Handler ──────────────────────────
+let cachedApp: any;
+export default async function handler(req: any, res: any) {
+  try {
+    if (!cachedApp) {
+      const nestApp = await createApp();
+      await nestApp.init();
+      cachedApp = nestApp.getHttpAdapter().getInstance();
+    }
+    cachedApp(req, res);
+  } catch (error) {
+    console.error('Serverless function error:', error);
+    res.status(500).json({ error: 'Internal Server Error', message: (error as any).message });
+  }
 }
 
+// ─── Local Development ──────────────────────────────────
 if (process.env.NODE_ENV !== 'production') {
-  bootstrap();
+  (async () => {
+    const app = await createApp();
+    const port = process.env.PORT || 3000;
+    await app.listen(port);
+    console.log(`🚀 Mosanada SaaS is running on: http://localhost:${port}`);
+    console.log(`📚 Swagger UI: http://localhost:${port}/api/docs`);
+  })();
 }
-
