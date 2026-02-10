@@ -4,7 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
-async function bootstrap() {
+export async function createApp() {
   const app = await NestFactory.create(AppModule);
 
   // Enable CORS
@@ -90,9 +90,18 @@ async function bootstrap() {
     res.redirect('/api/docs');
   });
 
+  return app;
+}
+
+async function bootstrap() {
+  const app = await createApp();
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`🚀 Mosanada SaaS is running on: http://localhost:${port}`);
-  console.log(`📚 Swagger UI: http://localhost:${port}/api/docs`);
+  console.log(`\uD83D\uDE80 Mosanada SaaS is running on: http://localhost:${port}`);
+  console.log(`\uD83D\uDCDA Swagger UI: http://localhost:${port}/api/docs`);
 }
-bootstrap();
+
+if (process.env.NODE_ENV !== 'production') {
+  bootstrap();
+}
+

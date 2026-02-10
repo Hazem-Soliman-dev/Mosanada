@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createApp = createApp;
 require("dotenv/config");
 const core_1 = require("@nestjs/core");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const app_module_1 = require("./app.module");
-async function bootstrap() {
+async function createApp() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.enableCors();
     app.useGlobalPipes(new common_1.ValidationPipe({
@@ -74,10 +75,16 @@ async function bootstrap() {
     httpAdapter.get('/', (req, res) => {
         res.redirect('/api/docs');
     });
+    return app;
+}
+async function bootstrap() {
+    const app = await createApp();
     const port = process.env.PORT || 3000;
     await app.listen(port);
-    console.log(`🚀 Mosanada SaaS is running on: http://localhost:${port}`);
-    console.log(`📚 Swagger UI: http://localhost:${port}/api/docs`);
+    console.log(`\uD83D\uDE80 Mosanada SaaS is running on: http://localhost:${port}`);
+    console.log(`\uD83D\uDCDA Swagger UI: http://localhost:${port}/api/docs`);
 }
-bootstrap();
+if (process.env.NODE_ENV !== 'production') {
+    bootstrap();
+}
 //# sourceMappingURL=main.js.map
